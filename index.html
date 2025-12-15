@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pixel Pomodoro ⏱️</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="timer-box" id="display">25:00</div>
+
+      <div class="label" id="mode">Focus Time</div>
+      <div class="note">Take a breath,<br />You are right on time ✨</div>
+
+      <div class="controls">
+        <button onclick="start()">Start</button>
+        <button onclick="pause()">Pause</button>
+        <button onclick="reset()">Reset</button>
+      </div>
+
+      <div class="side">
+        <label>Focus:</label><input id="focus" value="25" />
+        <label>Short Break:</label><input id="short" value="5" />
+        <label>Long Break:</label><input id="long" value="15" />
+      </div>
+    </div>
+
+    <audio
+      id="bell"
+      src="WhatsApp Audio 2025-12-15 at 13.17.17_b3197137.mp3"
+    ></audio>
+
+    <script>
+      let timer;
+      let time;
+      let running = false;
+      let session = "focus";
+      let focusCount = 0;
+
+      function setSession(type) {
+        session = type;
+        const focus = document.getElementById("focus").value;
+        const shortB = document.getElementById("short").value;
+        const longB = document.getElementById("long").value;
+
+        if (type === "focus") {
+          time = focus * 60;
+          document.getElementById("mode").textContent = "Focus Time";
+        } else if (type === "short") {
+          time = shortB * 60;
+          document.getElementById("mode").textContent = "Short Break";
+        } else {
+          time = longB * 60;
+          document.getElementById("mode").textContent = "Long Break";
+        }
+        update();
+      }
+
+      function update() {
+        const m = String(Math.floor(time / 60)).padStart(2, "0");
+        const s = String(time % 60).padStart(2, "0");
+        document.getElementById("display").textContent = `${m}:${s}`;
+      }
+
+      function playSound() {
+        document.getElementById("bell").play();
+      }
+
+      function nextSession() {
+        playSound();
+        if (session === "focus") {
+          focusCount++;
+          if (focusCount % 4 === 0) {
+            setSession("long");
+          } else {
+            setSession("short");
+          }
+        } else {
+          setSession("focus");
+        }
+        start();
+      }
+
+      function start() {
+        if (running) return;
+        running = true;
+        timer = setInterval(() => {
+          if (time > 0) {
+            time--;
+            update();
+          } else {
+            clearInterval(timer);
+            running = false;
+            nextSession();
+          }
+        }, 1000);
+      }
+
+      function pause() {
+        clearInterval(timer);
+        running = false;
+      }
+
+      function reset() {
+        clearInterval(timer);
+        running = false;
+        focusCount = 0;
+        setSession("focus");
+      }
+
+      setSession("focus");
+    </script>
+  </body>
+</html>
