@@ -24,6 +24,10 @@
         <label>Short Break:</label><input id="short" value="5" />
         <label>Long Break:</label><input id="long" value="15" />
       </div>
+      <div class="session-info">
+  Session: <span id="sessionCount">0</span> / 4
+</div>
+
     </div>
 
     <audio
@@ -43,6 +47,8 @@
         const focus = document.getElementById("focus").value;
         const shortB = document.getElementById("short").value;
         const longB = document.getElementById("long").value;
+        document.getElementById("sessionCount").textContent = focusCount;
+
 
         if (type === "focus") {
           time = focus * 60;
@@ -68,19 +74,28 @@
       }
 
       function nextSession() {
-        playSound();
-        if (session === "focus") {
-          focusCount++;
-          if (focusCount % 4 === 0) {
-            setSession("long");
-          } else {
-            setSession("short");
-          }
-        } else {
-          setSession("focus");
-        }
-        start();
-      }
+  playSound();
+
+  if (session === "focus") {
+    focusCount++;
+
+    if (focusCount === 4) {
+      setSession("long");
+    } else {
+      setSession("short");
+    }
+
+  } else if (session === "short") {
+    setSession("focus");
+
+  } else if (session === "long") {
+    focusCount = 0; // ⬅️ RESET setelah long break
+    setSession("focus");
+  }
+
+  start();
+}
+
 
       function start() {
         if (running) return;
